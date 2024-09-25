@@ -1,0 +1,33 @@
+FROM recorder-analysis-base:latest
+
+ARG DARSHAN_VERSION=3.4.5
+
+ENV LD_LIBRARY_PATH=/usr/local/lib
+
+RUN git clone https://github.com/darshan-hpc/darshan.git darshan && \
+    cd darshan && \
+    git checkout tags/darshan-${DARSHAN_VERSION} && \
+    ./prepare.sh && \
+    cd darshan-runtime && \
+    CC=mpicc ./configure \
+    --prefix=/usr/local \
+    --enable-hdf5-mod \
+    --with-jobid-env=NONE \
+    --with-hdf5=/usr/local \
+    --with-log-path=/var/log/darshan && \
+    make -j && \
+    make install && \
+    cd .. && \
+    cd darshan-util && \
+    ./configure --prefix=/usr/local && \
+    make -j && \
+    make install && \
+    cd .. && \
+    cd .. && \
+    rm -rf darshan
+
+ENV DXT_ENABLE_IO_TRACE=1 \
+    LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+
+RUN pip install --upgrade pip && \
+    pip install darshan==${DARSHAN_VERSION}
