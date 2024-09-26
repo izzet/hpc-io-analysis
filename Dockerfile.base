@@ -1,7 +1,13 @@
 FROM ubuntu:22.04
 
+ARG ARGOBOTS_VERSION=1.2
+ARG H5BENCH_VERSION=1.5
+ARG HDF5_ASYNC_VOL_VERSION=1.8.1
 ARG HDF5_VERSION=1.14.4.3
+ARG INSTALL_PREFIX=/usr/local
 ARG IOR_VERSION=3.3.0
+
+ENV LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib
 
 RUN apt-get update && \
     apt-get install -y \
@@ -27,32 +33,26 @@ RUN apt-get update && \
     openmpi-common \
     python3.10 \
     python3-pip && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    rm ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
 
-ENV OMPI_ALLOW_RUN_AS_ROOT=1 \
+COPY scripts/ /opt/scripts/
+
+WORKDIR /opt
+
+RUN . ./scripts/installation.sh && \
+    install_hdf5 ${INSTALL_PREFIX} ${HDF5_VERSION} && \
+    install_argobots ${INSTALL_PREFIX} ${ARGOBOTS_VERSION} && \
+    install_hdf5_async_vol ${INSTALL_PREFIX} ${HDF5_ASYNC_VOL_VERSION} && \
+    install_h5bench ${INSTALL_PREFIX} ${H5BENCH_VERSION} && \
+    install_ior ${INSTALL_PREFIX} ${IOR_VERSION}
+
+ENV HDF5_HOME=${INSTALL_PREFIX} \
+    HDF5_PLUGIN_PATH=${INSTALL_PREFIX}/lib \
+    HDF5_VOL_CONNECTOR="async under_vol=0;under_info={}" \
+    LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH} \
+    OMPI_ALLOW_RUN_AS_ROOT=1 \
     OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
-
-RUN git clone https://github.com/hpc/ior.git ior && \
-    cd ior && \
-    git checkout tags/${IOR_VERSION} && \
-    ./bootstrap && \
-    ./configure --prefix=/usr/local && \
-    make -j && \
-    make install && \
-    cd .. && \
-    rm -rf ior
-
-RUN git clone https://github.com/HDFGroup/hdf5.git hdf5 && \
-    cd hdf5 && \
-    git checkout tags/hdf5_${HDF5_VERSION} && \
-    CC=mpicc ./configure \
-    --prefix=/usr/local \
-    --enable-parallel && \
-    make -j && \
-    make install && \
-    make check-install && \
-    cd .. && \
-    rm -rf hdf5
 
 RUN pip install --upgrade pip && \
     pip install meson-python && \

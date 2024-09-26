@@ -1,5 +1,6 @@
 FROM recorder-analysis-base:latest
 
+ARG INSTALL_PREFIX=/usr/local
 ARG RECORDER_VERSION=2.3.3
 
 ENV RECORDER_HDF5_TRACING=1 \
@@ -9,19 +10,10 @@ ENV RECORDER_HDF5_TRACING=1 \
     RECORDER_INSTALL_PATH=/usr/local \
     RECORDER_TRACES_DIR=/var/log/recorder
 
-RUN git clone https://github.com/uiuc-hpc/Recorder.git recorder && \
-    cd recorder && \
-    git checkout tags/v${RECORDER_VERSION} && \
-    git submodule update --init --recursive && \
-    mkdir build && \
-    cd build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=${RECORDER_INSTALL_PATH} \
-    -DCMAKE_PREFIX_PATH=/usr/local/hdf5 && \
-    make -j && \
-    make install && \
-    cd .. && \
-    cd .. && \
-    rm -rf recorder
+WORKDIR /opt
+
+RUN . ./scripts/installation.sh && \
+    install_recorder ${INSTALL_PREFIX} ${RECORDER_VERSION}
 
 RUN pip install --upgrade pip && \
     pip install bokeh numpy pandas prettytable recorder-viz
