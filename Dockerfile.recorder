@@ -1,4 +1,4 @@
-FROM recorder-analysis-base:latest
+FROM hpc-io-analysis-base:latest
 
 ARG INSTALL_PREFIX=/usr/local
 ARG RECORDER_VERSION=2.3.3
@@ -7,7 +7,7 @@ ENV RECORDER_HDF5_TRACING=1 \
     RECORDER_MPIIO_TRACING=1 \
     RECORDER_MPI_TRACING=1 \
     RECORDER_POSIX_TRACING=1 \
-    RECORDER_INSTALL_PATH=/usr/local \
+    RECORDER_INSTALL_PATH=${INSTALL_PREFIX} \
     RECORDER_TRACES_DIR=/var/log/recorder
 
 WORKDIR /opt

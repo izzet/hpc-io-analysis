@@ -1,10 +1,10 @@
-FROM recorder-analysis-base:latest
+FROM hpc-io-analysis-base:latest
 
 ARG DARSHAN_VERSION=3.4.5
 ARG INSTALL_PREFIX=/usr/local
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    LD_LIBRARY_PATH=/usr/local/lib
+    LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib
 
 RUN apt-get update && \
     apt-get install -y \
@@ -25,7 +25,7 @@ RUN . ./scripts/installation.sh && \
     install_darshan ${INSTALL_PREFIX} ${DARSHAN_VERSION}
 
 ENV DXT_ENABLE_IO_TRACE=1 \
-    LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
 RUN pip install --upgrade pip && \
     pip install darshan==${DARSHAN_VERSION}
