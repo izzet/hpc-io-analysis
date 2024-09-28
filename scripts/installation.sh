@@ -123,6 +123,9 @@ install_ior() {
 install_recorder() {
     local prefix=$1
     local recorder_version=$2
+    if [ -n "$RECORDER_TRACES_DIR" ]; then
+        mkdir -p "$RECORDER_TRACES_DIR"
+    fi
     git clone https://github.com/uiuc-hpc/Recorder.git recorder
     # shellcheck disable=SC2164
     cd recorder
