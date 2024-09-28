@@ -3,7 +3,21 @@ FROM recorder-analysis-base:latest
 ARG DARSHAN_VERSION=3.4.5
 ARG INSTALL_PREFIX=/usr/local
 
-ENV LD_LIBRARY_PATH=/usr/local/lib
+ENV DEBIAN_FRONTEND=noninteractive \
+    LD_LIBRARY_PATH=/usr/local/lib
+
+RUN apt-get update && \
+    apt-get install -y \
+    cpanminus \
+    gnuplot \
+    perl \
+    texlive-font-utils \
+    texlive-fonts-recommended \
+    texlive-latex-base \
+    texlive-latex-extra && \
+    rm -rf /var/lib/apt/lists/* && \
+    cpanm Pod::Parser && \
+    cpanm Pod::LaTeX TeX::Encode
 
 WORKDIR /opt
 
