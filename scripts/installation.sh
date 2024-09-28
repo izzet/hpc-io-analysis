@@ -19,6 +19,7 @@ install_darshan() {
     local prefix=$1
     local darshan_version=$2
     local darshan_log_path=${3:-/var/log/darshan}
+    mkdir -p "$darshan_log_path"
     git clone https://github.com/darshan-hpc/darshan.git darshan
     # shellcheck disable=SC2164
     cd darshan
