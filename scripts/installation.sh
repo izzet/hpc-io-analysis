@@ -134,7 +134,9 @@ install_recorder() {
     mkdir build
     # shellcheck disable=SC2164
     cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX="$prefix"
+    cmake .. \
+        -DCMAKE_INSTALL_PREFIX="$prefix" \
+        -DRECORDER_ENABLE_PARQUET=ON
     make -j
     make install
     # shellcheck disable=SC2103
