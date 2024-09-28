@@ -2,3 +2,4 @@ checkpoints
 data
 hydra_log
 logs
+traces
