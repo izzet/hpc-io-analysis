@@ -6,6 +6,8 @@ prerun() {
     local log_dir="$3"
     local log_file="$4"
 
+    mkdir -p "$data_dir" "$log_dir"
+
     case "$tool" in
     darshan)
         export DARSHAN_DUMP_CONFIG=1
@@ -29,9 +31,6 @@ prerun() {
         exit 1
         ;;
     esac
-
-    mkdir -p "$data_dir"
-    mkdir -p "$log_dir"
 }
 
 postrun() {
