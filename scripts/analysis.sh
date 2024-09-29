@@ -67,7 +67,26 @@ postrun() {
     esac
 }
 
+run_fio() {
+    local timestamp=$(date +%s)
+    local tool="$1"
+
+    local fio_name="fio"
+
+    local data_dir="/tmp/$fio_name"
+
+    local log_dir="$2/$timestamp"
+    local log_file="$log_dir/$fio_name"
+
+    prerun "$tool" "$data_dir" "$log_dir" "$log_file"
+
+    fio --name=write --ioengine=sync --rw=write --bs=4k --size=1G --numjobs=1 --direct=1 --filename="$data_dir/$timestamp"
+
+    postrun "$tool" "$data_dir" "$log_dir" "$log_file"
+}
+
 run_h5bench() {
+    local timestamp=$(date +%s)
     local tool="$1"
 
     local h5bench_name="h5bench"
@@ -75,7 +94,7 @@ run_h5bench() {
 
     local data_dir="$h5bench_dir/storage"
 
-    local log_dir="$2/$(date +%s)"
+    local log_dir="$2/$timestamp"
     local log_file="$log_dir/$h5bench_name"
 
     prerun "$tool" "$data_dir" "$log_dir" "$log_file"
@@ -86,15 +105,15 @@ run_h5bench() {
 }
 
 run_ior() {
+    local timestamp=$(date +%s)
     local tool="$1"
 
     local ior_api="${3:-POSIX}"
     local ior_name="ior"
-    local ior_dir="/opt/$ior_name"
 
-    local data_dir="$ior_dir/storage"
+    local data_dir="/tmp/$ior_name"
 
-    local log_dir="$2/$(date +%s)"
+    local log_dir="$2/$timestamp"
     local log_file="$log_dir/$ior_name"
 
     if [ "$ior_api" = "HDF5" ]; then
@@ -108,7 +127,7 @@ run_ior() {
     # ior -a POSIX -b 1G -t 1m -w -F -o "$data_dir/ior"
     # ior -a MPIIO -b 1G -t 1m -w -F -o "$data_dir/ior"
 
-    ior -a "$ior_api" -b 4G -t 1m -w -F -o "$data_dir/ior" -O useO_DIRECT=1
+    ior -a "$ior_api" -b 4G -t 1m -w -F -o "$data_dir/$timestamp" -O useO_DIRECT=1
 
     postrun "$tool" "$data_dir" "$log_dir" "$log_file"
 }
