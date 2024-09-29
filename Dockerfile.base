@@ -1,6 +1,7 @@
 FROM ubuntu:22.04
 
 ARG ARGOBOTS_VERSION=1.2
+ARG FIO_VERSION=3.37
 ARG H5BENCH_VERSION=1.5
 ARG HDF5_ASYNC_VOL_VERSION=1.8.1
 ARG HDF5_VERSION=1.14.4.3
@@ -43,6 +44,7 @@ COPY scripts/ /opt/scripts/
 WORKDIR /opt
 
 RUN . ./scripts/installation.sh && \
+    install_fio ${INSTALL_PREFIX} ${FIO_VERSION} && \
     install_hdf5 ${INSTALL_PREFIX} ${HDF5_VERSION} && \
     install_argobots ${INSTALL_PREFIX} ${ARGOBOTS_VERSION} && \
     install_hdf5_async_vol ${INSTALL_PREFIX} ${HDF5_ASYNC_VOL_VERSION} && \

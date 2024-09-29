@@ -46,6 +46,20 @@ install_darshan() {
     cd ../..
 }
 
+install_fio() {
+    local prefix=$1
+    local fio_version=$2
+    git clone https://github.com/axboe/fio.git fio
+    # shellcheck disable=SC2164
+    cd fio
+    git checkout "tags/fio-$fio_version"
+    ./configure --prefix="$prefix"
+    make -j
+    make install
+    # shellcheck disable=SC2103
+    cd ..
+}
+
 install_hdf5() {
     local prefix=$1
     local hdf5_version=$2
